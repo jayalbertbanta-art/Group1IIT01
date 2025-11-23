@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SLSU CIT Website</title>
+
+  <style>
+    /* Reset + base */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:#fff;
+      background: url('https://image2url.com/images/1758634402946-ceccff4b-a61c-4ac7-b237-4d09d660eecd.jpg') center/cover no-repeat fixed;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      scroll-behavior:smooth;
+      line-height:1.45;
+    }
+    /* dark overlay */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:rgba(255, 255, 255, 0);
+      z-index:-1;
+    }
+
+    /* Header */
+    header{
+      position:fixed;
+      top:0;left:0;right:0;
+      z-index:9999;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px 20px;
+      gap:12px;
+      backdrop-filter: blur(6px);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:60px;height:60px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,0.1)}
+    .brand h1{font-size:18px;font-weight:700;color:#e7fdf0;letter-spacing:0.2px}
+    nav ul{display:flex;gap:10px;list-style:none;flex-wrap:wrap}
+    nav a{
+      background:#09409f;color:#f5f0f0;text-decoration:none;
+      padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer;
+      opacity:0;transform:translateY(-12px);
+      animation:popup 0.56s cubic-bezier(.2,.9,.3,1) forwards;
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow:0 6px 14px rgba(0, 0, 0, 0);
+    }
+    nav ul li:nth-child(1) a{animation-delay:0.14s}
+    nav ul li:nth-child(2) a{animation-delay:0.28s}
+    nav ul li:nth-child(3) a{animation-delay:0.42s}
+    nav a:hover{background:#61d2e8;color:#023047}
+    nav a:active{transform:scale(0.98)}
+    @keyframes popup {
+      0% {opacity: 0; transform: scale(0.85) translateY(-12px);}
+      60% {opacity: 1; transform: scale(1.03) translateY(4px);}
+      100% {opacity: 1; transform: scale(1) translateY(0);}
+    }
+
+    /* Page container */
+    .page{display:none;min-height:100vh;padding-top:92px}
+    .page.active{display:block}
+
+    /* HERO / Welcome */
+    .bg{position:relative;width:100%;min-height:100vh}
+    .bg::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0));z-index:0}
+    .welcome-center{display:flex;justify-content:center;align-items:center;height:calc(100vh - 92px);position:relative;z-index:2}
+    .welcome-box{
+      background:rgb(50, 5, 96);
+      padding:36px 48px;border-radius:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.6);display:inline-block;
+      transform:translateY(-120px);
+    }
+    .welcome-box h2{
+      font-size:clamp(28px,5vw,56px);
+      margin-bottom:6px;color:#7effcb;text-align:center;
+      font-weight:800;
+    }
+    .welcome-box p{font-size:clamp(14px,2vw,18px);opacity:0.95;color:#f0f0f0;text-align:center}
+
+    /* Facilities Section & slider */
+    .facilities-section{padding:40px 14px;background:linear-gradient(180deg,rgba(0, 0, 0, 0.299),rgba(0, 0, 0, 0.167));}
+    .facilities-section h2{color:#ffffff;text-align:center;margin-bottom:18px;font-size:28px}
+    .slider {
+      width:100%;
+      max-width:1200px;
+      margin:0 auto;
+      overflow:hidden;
+      border-radius:14px;
+      position:relative;
+      background:linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+      border:1px solid rgba(255,255,255,0.06);
+      box-shadow:0 10px 30px rgba(0, 0, 0, 0);
+    }
+    .slides {
+      display:flex;
+      transition: transform .3s cubic-bezier(.2,.9,.3,1);
+      will-change:transform;
+    }
+    .slide {
+      min-width:100%;
+      user-select:none;
+      -webkit-user-drag:none;
+      position:relative;
+    }
+    .slide img{
+      display:block;
+      width:100%;
+      height:420px;
+      object-fit:cover;
+      border-radius:14px;
+    }
+    /* Slide caption (optional) */
+    .slide .caption {
+      position:absolute;left:18px;bottom:18px;background:rgba(0,0,0,0.45);
+      padding:8px 12px;border-radius:8px;font-weight:700;color:#fff;
+      backdrop-filter: blur(3px);
+    }
+    /* dots */
+    .dots {position:absolute;left:50%;transform:translateX(-50%);bottom:12px;display:flex;gap:8px;z-index:6}
+    .dots button{width:10px;height:10px;border-radius:50%;border:0;background:rgba(255,255,255,0.35);cursor:pointer;opacity:0.8}
+    .dots button.active{background:#61e8b2;transform:scale(1.2)}
+
+    /* Facilities cards */
+    .cards {
+      display:flex;
+      flex-wrap:wrap;
+      gap:18px;
+      justify-content:center;
+      margin:26px auto 12px;
+      max-width:1200px;
+      padding:6px;
+    }
+    .card {
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:12px;
+      width:calc(33.33% - 20px);
+      min-width:220px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.5);
+      overflow:hidden;
+      transition:transform .25s ease, box-shadow .25s ease;
+      text-align:left;
+    }
+    .card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,0.6)}
+    .card img{width:100%;height:160px;object-fit:cover;display:block}
+    .card-content{padding:16px}
+    .card h3{color:#61e8b2;margin-bottom:8px;font-size:1.05rem}
+    .card p{color:#e9f0ee;font-size:0.95rem;line-height:1.4}
+
+    /* Mission & Vision */
+    .mission-vision{padding:48px 20px;background:rgba(0, 0, 0, 0);text-align:center}
+    .mission-vision h1{font-size:30px;margin-bottom:20px;color:#61e8b2}
+    .mv-container{display:flex;flex-wrap:wrap;justify-content:center;gap:22px;max-width:1100px;margin:0 auto}
+    .mv-box{flex:1 1 420px;background:rgba(43, 42, 42, 0.621);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px}
+    .mv-box h2{color:#61e8b2;margin-bottom:8px}
+    .mv-box p{color:#e9f1ef}
+
+    /* Org Chart */
+    #org-chart{padding:40px 12px;background:rgba(0, 0, 0, 0);text-align:center}
+    #org-chart h1{font-size:32px;color:#61e8b2;margin-bottom:12px}
+    .chart-container{display:flex;flex-direction:column;align-items:center;gap:10px}
+    .level{display:flex;justify-content:center;flex-wrap:wrap;gap:20px;margin:12px 0}
+    .box, .faculty-box{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);padding:14px;border-radius:10px;min-width:150px;text-align:center}
+    .profile{width:64px;height:64px;border-radius:50%;object-fit:cover;margin-bottom:8px;border:2px solid rgba(255,255,255,0.12)}
+    .faculty{display:flex;flex-direction:column;align-items:center;padding:6px}
+    .faculty img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,0.08);margin-bottom:6px}
+
+    .arrow{font-size:60px;color:#fff;margin:4px 0}
+
+    /* Announcement */
+    .announcement-section{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 12px;background:linear-gradient(180deg,rgba(6, 8, 20, 0.401),rgba(6, 8, 20, 0.21))}
+    .announcement-header{background:rgba(16, 21, 34, 0);color:#fff;text-align:center;padding:18px 26px;font-size:clamp(1.4rem,3vw,2rem);font-weight:700;border-radius:10px;border-bottom:2px solid rgba(255,255,255,0.06);width:100%;max-width:1100px}
+    .announcement-container{width:100%;max-width:1100px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:26px;margin-top:18px;text-align:center}
+    .announcement-container h2{font-size:1.6rem;color:#fff;margin-bottom:14px}
+    .announcement-container p{color:#e9eef0;font-size:1rem}
+    .announcement-container .date{margin-top:12px;font-size:.95rem;color:#c9ced2}
+
+    /* Footer */
+    footer{padding:18px 12px;text-align:center;color:#dfe7ea;background:transparent;border-top:1px solid rgba(255,255,255,0.03);margin-top:28px}
+
+    /* Page buttons */
+    .page-buttons{display:flex;justify-content:center;gap:12px;padding:24px 12px}
+    .page-buttons button{background:#279f09;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:700;cursor:pointer;transition:transform .15s ease}
+    .page-buttons button:hover{transform:translateY(-4px);background:#61e8b2;color:#023047}
+
+    /* Modals */
+    .modal{display:none;opacity:0;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;z-index:2000;transition:opacity .22s ease}
+    .modal.active{display:flex;opacity:1}
+    .modal-content{width:100%;max-width:640px;background:linear-gradient(180deg,rgba(8,12,25,0.5),rgba(0,0,0,0.6));padding:20px;border-radius:12px;position:relative;color:#fff;box-shadow:0 12px 38px rgba(0,0,0,0.6)}
+    .modal-content h2{margin-bottom:8px}
+    .close-btn{position:absolute;top:12px;right:12px;background:rgba(9,57,159,0.95);color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .modal p{line-height:1.6;color:#eef5f3}
+
+    /* Responsive */
+    @media (max-width:1000px){
+      .card{width:calc(50% - 16px)}
+      .slide img{height:360px}
+    }
+    @media (max-width:720px){
+      header{padding:10px 12px}
+      .brand h1{font-size:14px}
+      nav ul{gap:6px}
+      .card{width:100%}
+      .welcome-box{padding:26px}
+      .slide img{height:260px}
+      .mv-container{flex-direction:column}
+      .page-buttons{flex-direction:column;gap:10px}
+      .profile{width:56px;height:56px}
+    }
+
+    /* small animation for modal content */
+    @keyframes slideUp {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    .modal-content{animation:slideUp .28s cubic-bezier(.2,.9,.3,1)}
+  </style>
+
+      .modal-content{animation:slideUp .28s cubic-bezier(.2,.9,.3,1)}
+  </style>
+
+  <!-- 🔹 Student Council Section CSS (ilagay mo ito bago ang </head>) -->
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+      background:
+        linear-gradient(rgba(10, 20, 40, 0.8), rgba(5, 10, 25, 0.85)),
+        url('https://image2url.com/images/1758634402946-ceccff4b-a61c-4ac7-b237-4d09d660eecd.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #d8e9ff;
+      margin: 40px;
+      overflow-x: hidden;
+    }
+    h1 {
+      font-weight: 900;
+      text-decoration: underline;
+      color: #a5d8ff;
+      text-shadow: 0 0 25px rgba(150, 200, 255, 0.7);
+      margin-bottom: 50px;
+      font-size: 2.6em;
+      letter-spacing: 1.5px;
+    }
+    .chart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .level {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      margin: 40px 0;
+      gap: 50px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .node {
+      background: rgba(15, 30, 60, 0.55);
+      border: 1.5px solid rgba(130, 200, 255, 0.5);
+      border-radius: 10px;
+      padding: 14px 20px;
+      box-shadow: 0 0 10px rgba(130, 200, 255, 0.2);
+      width: 230px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.3s ease;
+      backdrop-filter: blur(6px);
+      color: #e6f2ff;
+    }
+    .node:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 0 20px rgba(130, 200, 255, 0.45);
+      border-color: #b5e2ff;
+      cursor: pointer;
+    }
+    .node strong {
+      color: #aee0ff;
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    @keyframes softGlow {
+      0% {
+        stroke: #8fc9ff;
+        filter: drop-shadow(0 0 4px #8fc9ff);
+      }
+      50% {
+        stroke: #d8f0ff;
+        filter: drop-shadow(0 0 8px #d8f0ff);
+      }
+      100% {
+        stroke: #8fc9ff;
+        filter: drop-shadow(0 0 4px #8fc9ff);
+      }
+    }
+  </style>
+  <!-- 🔹 END Student Council CSS -->
+</head>
+<body>
+
+  <!-- Header -->
+  <header id="mainHeader" role="banner">
+    <div class="brand" aria-hidden="false">
+      <img src="https://image2url.com/images/1760964530631-ba896a1d-ff31-43b4-bec6-3dc210386fb3.png" alt="SLSU Logo">
+      <h1>SLSU College of Industrial Technology</h1>
+    </div>
+
+    <nav role="navigation" aria-label="Primary">
+      <ul>
+        <li><a href="#" onclick="openModal('aboutModal'); return false;">About</a></li>
+        <li><a href="#" onclick="openModal('servicesModal'); return false;">Services</a></li>
+        <li><a href="#" onclick="openModal('contactModal'); return false;">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- FRONT PAGE -->
+  <main id="frontPage" class="page active" role="main" aria-labelledby="welcomeTitle">
+    <div class="bg" aria-hidden="false">
+      <div class="welcome-center">
+        <div class="welcome-box" aria-labelledby="welcomeTitle">
+          <h2 id="welcomeTitle">Welcome to CIT</h2>
+          <p>Southern Luzon State University — College of Industrial Technology</p>
+        </div>
+      </div>
+
+      <!-- Facilities / slider -->
+      <section class="facilities-section" aria-labelledby="facTitle">
+        <h2 id="facTitle">Our Facilities</h2>
+
+        <div class="slider" id="slider">
+          <div class="slides" id="slides">
+            <!-- slide items -->
+            <div class="slide"><img src="https://image2url.com/images/1760258365161-0a6bbd64-8e64-4699-aaaf-53a6ec5c4553.jpg" alt="Hallway"><div class="caption">Computer Laboratory</div></div>
+            <div class="slide"><img src="https://image2url.com/images/1760256614569-6fdaf4a2-8d1d-4cc5-8663-7ba09dc4d708.jpg" alt="Automotive Technology"><div class="caption">Automotive Technology</div></div>
+            <div class="slide"><img src="https://image2url.com/images/1760256910128-f526a687-4e8b-4749-912e-7da3d72bb776.jpg" alt="Electronics Technology"><div class="caption">Electronics Technology</div></div>
+            <div class="slide"><img src="https://image2url.com/images/1760448304125-a3916b26-8bf7-49a5-83f7-456272178ef2.jpg" alt="Apparel and Fashion Technology"><div class="caption">Apparel and Fashion Technology</div></div>
+            <div class="slide"><img src="https://image2url.com/images/1760453418698-0cb0dd91-ced8-4a50-97c0-4bf85dff60d9.jpg" alt="Electrical Technology"><div class="caption">Electrical Technology</div></div>
+            <div class="slide"><img src="https://image2url.com/images/1760504351921-dc3cee8d-445a-4b50-94f4-e984f79817bd.jpg" alt="Culinary Technology"><div class="caption">Culinary Technology</div></div>
+            <div class="slide"><img src="https://image2url.com/images/1760453320486-2c1c3ab9-1afa-4d6f-ab4a-c8ad0bf03946.jpg" alt="Information Technology"><div class="caption">Information Technology</div></div>
+            <div class="slide"><img src="https://image2url.com/images/1760447640843-f4510bbe-5469-410c-9879-58a60e9dc5dc.jpg" alt="Computer Technology"><div class="caption">Computer Technology</div></div>
+            <div class="slide"><img src="https://image2url.com/images/1760453597290-38a67f23-794c-4a06-9c8d-8ce23b6cdfc6.jpg" alt="Mechanical Technology"><div class="caption">Mechanical Technology</div></div>
+            <!-- add more slides as needed -->
+          </div>
+
+          <!-- dots (JS-controlled) -->
+          <div class="dots" id="dots" aria-hidden="true"></div>
+        </div>
+
+        <!-- cards -->
+        <div class="cards" aria-live="polite">
+          <article class="card" aria-label="Apparel and Fashion Technology">
+            <img src="https://image2url.com/images/1760448304125-a3916b26-8bf7-49a5-83f7-456272178ef2.jpg" alt="">
+            <div class="card-content">
+              <h3>Apparel and Fashion Technology</h3>
+              <p>Industrial sewing and production floors, CAD labs, and textile testing equipment for applied practice.</p>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Automotive Technology">
+            <img src="https://image2url.com/images/1760447742540-84d27f96-4565-4927-9460-720b74bbbd2b.jpg" alt="">
+            <div class="card-content">
+              <h3>Automotive Technology</h3>
+              <p>Workshop bays with lifts, diagnostic tools, and dynamometer labs for performance and systems testing.</p>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Computer Technology">
+            <img src="https://image2url.com/images/1760447640843-f4510bbe-5469-410c-9879-58a60e9dc5dc.jpg" alt="">
+            <div class="card-content">
+              <h3>Computer Technology</h3>
+              <p>High-performance PC labs, server rooms, and networking gear for systems and infrastructure practice.</p>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Culinary Technology">
+            <img src="https://image2url.com/images/1760504351921-dc3cee8d-445a-4b50-94f4-e984f79817bd.jpg" alt="">
+            <div class="card-content">
+              <h3>Culinary Technology</h3>
+              <p>Pilot plants for processing, analytical labs, and equipment for food safety & quality testing.</p>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Information Technology">
+            <img src="https://image2url.com/images/1760453320486-2c1c3ab9-1afa-4d6f-ab4a-c8ad0bf03946.jpg" alt="">
+            <div class="card-content">
+              <h3>Information Technology</h3>
+              <p>Data centers, specialized labs for network management, and cybersecurity practice on virtual platforms.</p>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Electrical Technology">
+            <img src="https://image2url.com/images/1760453418698-0cb0dd91-ced8-4a50-97c0-4bf85dff60d9.jpg" alt="">
+            <div class="card-content">
+              <h3>Electrical Technology</h3>
+              <p>Test benches, power supplies, and labs for motor control and power distribution simulation.</p>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Electronics Technology">
+            <img src="https://image2url.com/images/1760453484406-cecde426-045c-485b-b9e1-c4e45b48a033.jpg" alt="">
+            <div class="card-content">
+              <h3>Electronics Technology</h3>
+              <p>Workbenches with diagnostic tools, PCB areas, and equipment for circuit testing and prototyping.</p>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Mechanical Technology">
+            <img src="https://image2url.com/images/1760453597290-38a67f23-794c-4a06-9c8d-8ce23b6cdfc6.jpg" alt="">
+            <div class="card-content">
+              <h3>Mechanical Technology</h3>
+              <p>Machine shops with CNC machinery, testing labs for fluids, thermodynamics, and manufacturing processes.</p>
+            </div>
+          </article>
+
+          <article class="card" aria-label="Print Media Technology">
+            <img src="https://image2url.com/images/1760503483705-18be4ac7-f426-4923-8b8d-2f352e31e15d.jpg" alt="">
+            <div class="card-content">
+              <h3>Print Media Technology</h3>
+              <p>Industrial printing presses and design suites for professional print production and finishing practice.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Mission & Vision -->
+      <section class="mission-vision" aria-labelledby="mvTitle">
+        <h1 id="mvTitle">Mission & Vision</h1>
+        <div class="mv-container">
+          <div class="mv-box">
+            <h2>Our Mission</h2>
+            <p>Contribute to the skills development of Filipino workers. Innovatively proficient, productive, and versatile—transforming students with competence essentials for technological advancement.</p>
+          </div>
+          <div class="mv-box">
+            <h2>Our Vision</h2>
+            <p>To be a leading, innovative, high-performing college that develops technologically proficient graduates ready for industry challenges.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="page-buttons">
+      <button onclick="showPage('orgChartPage')">Go to Org Chart</button>
+      <button onclick="showPage('announcementPage')">Go to Announcement</button>
+      <button onclick="showPage('studentCouncilPage')">Go to Student Council</button>
+    </div>
+
+    <footer>
+      © <span>2025</span> Southern Leyte State University - College of Industrial Technology. All Rights Reserved.
+    </footer>
+  </main>
+
+  <!-- ORGANIZATIONAL CHART PAGE -->
+  <section id="orgChartPage" class="page" aria-labelledby="orgTitle" style="display:none;">
+    <div id="org-chart">
+      <h1 id="orgTitle">Organizational Chart</h1>
+      <div class="chart-container" role="tree">
+        <div class="level president">
+          <div class="box" role="treeitem">
+            <img src="https://image2url.com/images/1759964888888-061d939a-bb64-48a1-9180-9b3ec3fe4a6b.jpg" alt="University President" class="profile">
+            <div><strong>University President</strong></div>
+            <div>Dr. Frederick T. Villa</div>
+          </div>
+        </div>
+
+        <div class="arrow">&#8595;</div>
+
+        <div class="level dean">
+          <div class="box">
+            <img src="https://image2url.com/images/1759955654779-4c98515c-81a8-4cbe-ab0f-c32b2f9612db.jpg" alt="Dean" class="profile">
+            <div><strong>Dean</strong></div>
+          </div>
+        </div>
+
+        <div class="arrow">&#8595;</div>
+
+        <div class="level head">
+          <div class="box">
+            <img src="https://image2url.com/images/1759955701486-218a0497-4a5a-41fb-a3d6-ebd3097a4427.jpg" alt="Department Head" class="profile">
+            <div><strong>Department Head</strong></div>
+            <div>BindTech-ELX Program Chair</div>
+          </div>
+        </div>
+
+        <div class="arrow">&#8595;</div>
+
+        <div class="level programs" aria-label="Program Chairs">
+          <div class="box"><img src="https://image2url.com/images/1759955766136-e0e2ef60-a6f6-40ed-828f-56855a24630c.jpg" class="profile" alt="">AFT<br><small>Program Chair</small></div>
+          <div class="box"><img src="https://image2url.com/images/1759965100319-34e6ba98-56d9-4c28-ba1a-608293960dd9.jpg" class="profile" alt="">AT<br><small>Program Chair</small></div>
+          <div class="box"><img src="https://image2url.com/images/1759957295635-32db750f-ef46-4c6e-95a2-31f1c659eff9.jpg" class="profile" alt="">CPT<br><small>Program Chair</small></div>
+          <div class="box"><img src="https://image2url.com/images/1759965220092-fa88b82e-d0e3-458c-ad3c-ebbde787cd2a.jpg" class="profile" alt="">CT<br><small>Program Chair</small></div>
+          <div class="box"><img src="https://image2url.com/images/1759956908317-81980817-2bae-4065-a640-1c942a62884f.jpg" class="profile" alt="">IT<br><small>Program Chair</small></div>
+          <div class="box"><img src="https://image2url.com/images/1759957881731-a14db103-ae46-40f3-9609-d40be02de92c.jpg" class="profile" alt="">ELT<br><small>Program Chair</small></div>
+          <div class="box"><img src="https://image2url.com/images/1759956999200-16aebafe-03b9-4c33-8160-0b126cd63e72.jpg" class="profile" alt="">MT<br><small>Program Chair</small></div>
+          <div class="box"><img src="https://image2url.com/images/1759958016955-5353c2d9-b70e-4fd0-ad77-0eb7ca450efe.jpg" class="profile" alt="">PMT<br><small>Program Chair</small></div>
+        </div>
+
+        <div class="arrow">&#8595;</div>
+
+        <div class="level faculties" aria-label="Faculties">
+          <div class="faculty-box">
+            <h3>AFT</h3>
+            <div class="faculty"><img src="https://image2url.com/images/1759965362214-d50568a2-cd5a-41a5-b15c-8bb2842f83d4.jpg" alt="">Faculty 1</div>
+          </div>
+
+          <div class="faculty-box">
+            <h3>AT</h3>
+            <div class="faculty"><img src="https://image2url.com/images/1759955433547-c6f3b402-976a-4a14-823e-c04abaa1b178.jpg" alt="">Faculty 1</div>
+            <div class="faculty"><img src="https://image2url.com/images/1759955167778-3f72b8fe-8b9c-440b-8dbf-648174efd02d.jpg" alt="">Faculty 2</div>
+          </div>
+
+          <div class="faculty-box">
+            <h3>CPT</h3>
+            <div class="faculty"><img src="https://image2url.com/images/1759965779746-b20eeed4-7533-4584-bc67-280d6bcedc32.jpg" alt="">Faculty 1</div>
+            <div class="faculty"><img src="https://image2url.com/images/1759955568150-7305d092-3016-46a9-b296-69a29fc0c51b.jpg" alt="">Faculty 2</div>
+          </div>
+
+          <div class="faculty-box">
+            <h3>IT</h3>
+            <div class="faculty"><img src="https://image2url.com/images/1759966297902-f2079922-5b73-492d-98fa-ea1e3f0f4327.jpg" alt="">Faculty 1</div>
+            <div class="faculty"><img src="https://image2url.com/images/1760536793348-008c92a1-5f38-4eef-bc9e-af0af2d2e8e2.jpg" alt="">Faculty 2</div>
+            <div class="faculty"><img src="https://image2url.com/images/1760536811960-ccf01660-2198-4e67-8e6a-44ae053a5e36.jpg" alt="">Faculty 3</div>
+          </div>
+
+          <div class="faculty-box">
+            <h3>ELT</h3>
+            <div class="faculty"><img src="https://image2url.com/images/1759957845540-053799d0-ff2f-47bc-b943-39cca9eb2f01.jpg">Faculty 1</div>
+            <div class="faculty"><img src="https://image2url.com/images/1759957881731-a14db103-ae46-40f3-9609-d40be02de92c.jpg">Faculty 2</div>
+          </div>
+
+          <div class="faculty-box">
+            <h3>ELX</h3>
+            <div class="faculty"><img src="https://image2url.com/images/1759958192577-3a7bf3b0-7822-4881-bf98-13581dd6b766.jpg">Faculty 1</div>
+          </div>
+
+          <div class="faculty-box">
+            <h3>MT</h3>
+            <div class="faculty"><img src="profile.jpg">Faculty 1</div>
+          </div>
+          
+          <div class="faculty-box">
+            <h3>PMT</h3>
+            <div class="faculty"><img src="https://image2url.com/images/1759957647475-10aee731-9c0b-4621-a246-5208b28136fe.jpg">Faculty 1</div>
+            <div class="faculty"><img src="https://image2url.com/images/1759957675637-285fbe11-661f-4a53-b061-0fa3e414554b.jpg">Faculty 2</div>
+            <div class="faculty"><img src="https://image2url.com/images/1760536607746-c39fe7da-83cc-4bd8-b22d-6139c61182ba.jpg">Faculty 3</div>
+          </div>
+
+          <!-- add more faculty boxes as needed -->
+        </div>
+      </div>
+
+      <div class="page-buttons">
+        <button onclick="showPage('frontPage')">Back to Front Page</button>
+        <button onclick="showPage('announcementPage')">Go to Announcement</button>
+        <button onclick="showPage('studentCouncilPage')">Go to Student Council</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ ORG CHART PAGE -->
+<section id="studentCouncilPage" class="page" style="display:none;">
+  <h1>CIT Student Council</h1>
+  <div class="chart" id="chart">
+
+    <!-- Advisers -->
+    <div class="level" data-level="1">
+      <div class="node" id="adviser"><strong>Adviser</strong>Christian Edward B. Macariola</div>
+      <div class="node" id="coadviser"><strong>Co-Adviser</strong>Giles Dela Rosa</div>
+    </div>
+
+    <!-- Governor -->
+    <div class="level" data-level="2">
+      <div class="node" id="governor"><strong>Governor</strong>Hace Caryl A. Derilo</div>
+    </div>
+
+    <!-- Vice Governor -->
+    <div class="level" data-level="3">
+      <div class="node"><strong>Vice Governor</strong>Nathaniel Perez</div>
+    </div>
+
+    <!-- Executive Secretary -->
+    <div class="level" data-level="4">
+      <div class="node"><strong>Executive Secretary</strong>Jose Emmanuel A. Sicat</div>
+    </div>
+
+    <!-- Secretaries, Treasurer, Auditor -->
+    <div class="level" data-level="5">
+      <div class="node"><strong>Secretary</strong>James Marc T. Barnuevo</div>
+      <div class="node"><strong>Assistant Secretary</strong>Trisha May R. Rosende</div>
+      <div class="node"><strong>Treasurer</strong>Joyce Ann Garcia</div>
+      <div class="node"><strong>Auditor</strong>Morine Andrea P. Ruiz</div>
+    </div>
+
+    <!-- Councilors -->
+    <div class="level" data-level="6">
+      <div class="node"><strong>Councilor — LEGMA</strong>Dirk John Steven Callos</div>
+      <div class="node"><strong>Councilor — EDRES</strong>Sofiah Illyzah Marquez</div>
+      <div class="node"><strong>Councilor — STRAW</strong>John Francis Manansala</div>
+      <div class="node"><strong>Councilor — CI</strong>Nikkisha Bryce Barranda</div>
+      <div class="node"><strong>Councilor — GAD</strong>Millen Lorenz B. Empensando</div>
+      <div class="node"><strong>Councilor — HE</strong>Carlos Miguel P. Ricablanca</div>
+      <div class="node"><strong>Councilor — SPORTS</strong>Rey Aldwin Lagdameo</div>
+      <div class="node"><strong>Councilor — SPIRITUAL</strong>(Vacant)</div>
+      <div class="node"><strong>Councilor — CA</strong>Fenicia Maxene Amora</div>
+      <div class="node"><strong>Councilor — SANO</strong>Jheniffer N. Salayo</div>
+      <div class="node"><strong>Councilor — CESL</strong>Reyson Zaide</div>
+    </div>
+
+    <!-- Representatives -->
+    <div class="level" data-level="7">
+      <div class="node"><strong>Automotive Tech Rep</strong>Stephen Gabriel P. Dinglasan</div>
+      <div class="node"><strong>Apparel & Fashion Tech Rep</strong>Shan Keil S. Vargas</div>
+      <div class="node"><strong>Computer Tech Rep</strong>John Nicole R. Cortez</div>
+      <div class="node"><strong>Culinary Tech Rep</strong>Agatha Moira R. Camaligan</div>
+      <div class="node"><strong>Electrical Tech Rep</strong>Neil E. Siores</div>
+      <div class="node"><strong>Electronics Tech Rep</strong>Keith Earl Vincent M. Alan</div>
+      <div class="node"><strong>Print Media Tech Rep</strong>Kassery R. Franco</div>
+      <div class="node"><strong>Mechanical Tech Rep</strong>Niel Edcel L. Razo</div>
+      <div class="node"><strong>Information Tech Rep</strong>Naomi Kate E. Tan</div>
+    </div>
+
+    <svg id="connections"></svg>
+  </div>
+
+  <div class="page-buttons" style="margin-top: 30px;">
+    <button onclick="showPage('frontPage')">Back to Front Page</button>
+    <button onclick="showPage('announcementPage')">Go to Announcement</button>
+    <button onclick="showPage('studentCouncilPage')">Go to Student Council</button>
+  </div>
+</section>
+
+
+  <!-- ANNOUNCEMENT PAGE -->
+  <section id="announcementPage" class="page" aria-labelledby="annTitle" style="display:none;">
+    <div class="announcement-section">
+      <div class="announcement-header" role="heading" aria-level="1">
+        School Announcement
+      </div>
+
+      <div class="announcement-container" aria-labelledby="annTitle">
+        <h2 id="annTitle">Important Announcement</h2>
+        <p>
+          We are pleased to inform all students that the upcoming <strong>General Assembly</strong>
+          will be held on <strong>October 15, 2025</strong> at the <strong>Main Auditorium</strong>.
+          Attendance is required for all departments. Please be on time and wear your complete uniform.
+        </p>
+        <p class="date">Posted on October 7, 2025</p>
+      </div>
+
+      <footer>
+        © 2025 College of Technology | Tayabas City, Quezon
+      </footer>
+
+      <div class="page-buttons" style="margin-top:18px">
+        <button onclick="showPage('frontPage')">Back to Front Page</button>
+        <button onclick="showPage('orgChartPage')">Go to Org Chart</button>
+        <button onclick="showPage('studentCouncilPage')">Go to Student Council</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle">
+    <div class="modal-content" role="document">
+      <button class="close-btn" aria-label="Close about" onclick="closeModal('aboutModal')">Close</button>
+      <h2 id="aboutTitle">About</h2>
+      <p>
+        Welcome to the SLSU College of Industrial Technology! We are dedicated to providing high-quality education that prepares students
+        for the challenges of modern industry through hands-on learning, innovation, and community engagement.
+      </p>
+    </div>
+  </div>
+
+  <!-- Services Modal -->
+  <div id="servicesModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="servicesTitle">
+    <div class="modal-content" role="document">
+      <button class="close-btn" aria-label="Close services" onclick="closeModal('servicesModal')">Close</button>
+      <h2 id="servicesTitle">Services</h2>
+      <p>
+        Our college offers a wide range of programs and services, including:
+      </p>
+      <ul style="margin-left:18px;margin-top:8px;color:#eafbf3;">
+        <li>Technical and vocational courses</li>
+        <li>Research and development projects</li>
+        <li>Community outreach programs</li>
+        <li>Industry partnerships and internships</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="contactTitle">
+    <div class="modal-content" role="document">
+      <button class="close-btn" aria-label="Close contact" onclick="closeModal('contactModal')">Close</button>
+      <h2 id="contactTitle">Contact Us</h2>
+      <p>
+        You can reach us at:
+      </p>
+      <p style="margin-top:8px">
+        📧 Email: <a href="mailto:cit@slsu.edu.ph" style="color:#61e8b2;text-decoration:none">cit@slsu.edu.ph</a><br>
+        ☎️ Phone: (042) 555-1234<br>
+        📍 Location: SLSU Main Campus, Lucban, Quezon
+      </p>
+    </div>
+  </div>
+
+  <script>
+    /* Page navigation */
+function showPage(pageId){
+  const pages = document.querySelectorAll('.page');
+  pages.forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+
+  const target = document.getElementById(pageId);
+  if (!target) return;
+  target.style.display = 'block';
+  setTimeout(() => { 
+    target.classList.add('active'); 
+    if (typeof connectBoxes === 'function' && (pageId === 'orgChartPage' || pageId === 'studentCouncilPage')) {
+      setTimeout(connectBoxes, 60);
+    }
+  }, 8);
+
+
+  const header = document.getElementById('mainHeader');
+  if(pageId === 'frontPage'){
+    header.style.opacity = '1';
+    header.style.pointerEvents = 'auto';
+  } else {
+    header.style.opacity = '1';
+    header.style.pointerEvents = 'auto';
+  }
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+    /* Modal functions */
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if(!modal) return;
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden','false');
+      // trap focus (simple)
+      const close = modal.querySelector('.close-btn');
+      if(close) close.focus();
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if(!modal) return;
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    // Close modal on overlay click / Esc
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', e => {
+        if(e.target === modal) closeModal(modal.id);
+      });
+    });
+    window.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape'){
+        document.querySelectorAll('.modal.active').forEach(m => closeModal(m.id));
+      }
+    });
+
+    /* Facilities slider (JS controlled) - auto slide every 2 seconds, pause on hover */
+    (function(){
+      const slidesWrap = document.getElementById('slides');
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const dotsContainer = document.getElementById('dots');
+      let index = 0;
+      let slideCount = slides.length;
+      let interval = 2000; // 2 seconds
+      let timer = null;
+      let isHovered = false;
+
+      // build dots
+      for(let i=0;i<slideCount;i++){
+        const btn = document.createElement('button');
+        btn.setAttribute('aria-label','Go to slide ' + (i+1));
+        btn.addEventListener('click', ()=> { goTo(i); resetTimer(); });
+        dotsContainer.appendChild(btn);
+      }
+      const dots = Array.from(dotsContainer.children);
+
+      function update(){
+        const translateX = -index * 100;
+        slidesWrap.style.transform = 'translateX(' + translateX + '%)';
+        dots.forEach((d, i) => d.classList.toggle('active', i === index));
+      }
+
+      function next(){
+        index = (index+1) % slideCount;
+        update();
+      }
+
+      function goTo(i){
+        index = Math.max(0, Math.min(i, slideCount-1));
+        update();
+      }
+
+      function startTimer(){
+        if(timer) clearInterval(timer);
+        timer = setInterval(()=> { if(!isHovered) next(); }, interval);
+      }
+
+      function resetTimer(){
+        startTimer();
+      }
+
+      // pause on hover
+      const slider = document.getElementById('slider');
+      slider.addEventListener('mouseenter', ()=> { isHovered = true; });
+      slider.addEventListener('mouseleave', ()=> { isHovered = false; });
+
+      // init
+      update();
+      startTimer();
+
+      // make swipe for mobile (simple)
+      let startX = 0;
+      let endX = 0;
+      slider.addEventListener('touchstart', (e)=> { startX = e.touches[0].clientX; });
+      slider.addEventListener('touchmove', (e)=> { endX = e.touches[0].clientX; });
+      slider.addEventListener('touchend', ()=>{
+        const dx = endX - startX;
+        if(Math.abs(dx) > 40){
+          if(dx < 0) next();
+          else { index = (index - 1 + slideCount) % slideCount; update(); }
+          resetTimer();
+        }
+        startX = endX = 0;
+      });
+
+      // accessibility: keyboard left/right
+      slider.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowLeft'){ index = (index - 1 + slideCount) % slideCount; update(); resetTimer(); }
+        if(e.key === 'ArrowRight'){ next(); resetTimer(); }
+      });
+    })();
+
+        function connectBoxes() {
+      const svg = document.getElementById("connections");
+      svg.innerHTML = "";
+      const chart = document.getElementById("chart");
+      const svgRect = chart.getBoundingClientRect();
+
+      function drawLine(x1, y1, x2, y2) {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const midY = (y1 + y2) / 2;
+        path.setAttribute("d", `M${x1},${y1} L${x1},${midY} L${x2},${midY} L${x2},${y2}`);
+        path.setAttribute("stroke", "#a5d8ff");
+        path.setAttribute("stroke-width", "1.8");
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke-linecap", "round");
+        path.style.animation = "softGlow 3s infinite ease-in-out";
+        svg.appendChild(path);
+      }
+
+      const adviser = document.getElementById("adviser");
+      const coadviser = document.getElementById("coadviser");
+      const governor = document.getElementById("governor");
+      if (adviser && coadviser && governor) {
+        const aRect = adviser.getBoundingClientRect();
+        const cRect = coadviser.getBoundingClientRect();
+        const gRect = governor.getBoundingClientRect();
+        const aX = aRect.left + aRect.width / 2 - svgRect.left;
+        const cX = cRect.left + cRect.width / 2 - svgRect.left;
+        const aY = aRect.bottom - svgRect.top;
+        const cY = cRect.bottom - svgRect.top;
+        const gX = gRect.left + gRect.width / 2 - svgRect.left;
+        const gY = gRect.top - svgRect.top;
+        const barY = gY - 40;
+        const midX = (aX + cX) / 2;
+
+        drawLine(aX, aY, aX, barY);
+        drawLine(cX, cY, cX, barY);
+        drawLine(aX, barY, cX, barY);
+        drawLine(midX, barY, gX, gY);
+      }
+
+      const levels = [...chart.querySelectorAll(".level")];
+      for (let i = 1; i < levels.length - 1; i++) {
+        const topNodes = [...levels[i].querySelectorAll(".node")];
+        const bottomNodes = [...levels[i + 1].querySelectorAll(".node")];
+        if (!topNodes.length || !bottomNodes.length) continue;
+        const parent = topNodes[Math.floor(topNodes.length / 2)];
+        const topRect = parent.getBoundingClientRect();
+
+        bottomNodes.forEach(node => {
+          const nRect = node.getBoundingClientRect();
+          const x1 = topRect.left + topRect.width / 2 - svgRect.left;
+          const y1 = topRect.bottom - svgRect.top;
+          const x2 = nRect.left + nRect.width / 2 - svgRect.left;
+          const y2 = nRect.top - svgRect.top;
+          drawLine(x1, y1, x1, (y1 + y2) / 2);
+          drawLine(x1, (y1 + y2) / 2, x2, (y1 + y2) / 2);
+          drawLine(x2, (y1 + y2) / 2, x2, y2);
+        });
+      }
+    }
+
+    /* small enhancement: ensure focus outlines remain visible for keyboard users */
+    (function(){
+      function handleFirstTab(e) {
+        if (e.key === 'Tab') {
+          document.body.classList.add('user-is-tabbing');
+        }
+      }
+// call connectBoxes on initial load (in case chart pages are shown later)
+window.addEventListener('load', () => {
+  if (typeof connectBoxes === 'function') setTimeout(connectBoxes, 120);
+});
+window.addEventListener('resize', () => {
+  if (typeof connectBoxes === 'function') connectBoxes();
+});
+})();
+  </script>
+</body>
+</html>
